@@ -10,7 +10,7 @@ ping -c2 $ip >/dev/null 2>&1
 
 if [ $? != 0 ]
 then
-	echo "La maquina con la ip $ip no es alcanzable"
+	echo "La maquina con la ip $ip no es alcanzable" | logger -p local0.info
 	exit 2
 fi
 

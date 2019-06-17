@@ -5,44 +5,49 @@
 PARTE 1:
 --------
 
-#Maquina 192.168.56.2:
+Para llevar a cabo la monitorizacion de las dos maquinas centralizada se han empleado dos maquinas
+con las siguientes ips: 192.168.56.4 (Host, central) y 192.168.56.2 (maquina aparte).
 
--Añadir al fichero rsyslog.conf:
-local0.info @192.168.56.3:514
-(El @ indica una conexion udp, la ip la maquina remota, y 514
-el puerto estandar a usar)
+En primer lugar se ha conigurado la maquina host, que es la que almacena los ficheros de log. Primero 
+se ha implementado el script practica6_parte1.sh. Después se ha configurado el fichero /etc/rsyslog.conf
+de la siguiente forma:
+	- Se ha descomentado el modulo e input del protocolo udp:
+			#module (load="imudp"
+			#input (type="imdup" port="514")
+	- Se ha añadido una regla:
+			#local0.info		/var/log/monitorizacion.log
+			(Con la especifiación que se pide en el enunciado, se concreta el fichero destino de los logs)
 
-Para evitar que nos pida la contraseña a causa del ssh hacemos:
-ssh-keygen -b 4096 -t rsa
-ssh-copy-id as@192.168.56.3
+Previamente el fichero /var/log/monitorizacion.log ha sido creado.
+Para finalizar se ha modificado el fichero /etc/crontab añadiendo un nuevo trabajo para que se ejecute 
+el script practica6_parte1.sh cada minuto, para ello se ha empleado la siguiente sintaxis:
+	* * * * user /home/user/prac6/practica6_parte1.sh > /dev/null
 
-Para que no envie emails añadir en el fichero crontab:
-MAILTO=/dev/null
+Además se ha añadido la siguiente linea para que no envié emails:
+	MAILTO=/dev/null
+	
+	
+Para configurar la otra máquina (192.168.56.2) solo hay que añadir la siguiente línea al fichero /etc/rsyslog.conf:
+	local0.info @192.168.56.3:514
+	(El @ indica una conexion udp, la ip la maquina remota, y 514 el puerto estandar a usar).
 
-Hacerlo periodico añadiendo a crontab:
-HOME=/
-* * * * root /home/as/prac6/practica6.sh > /dev/null
+	
+			
+Finalmente como resultado tenemos que cada minutos se ejecuta el script, que recoge en el fichero 
+monitorizacion.log una serie de información relevante tanto de la máquina host como de la otra. Cabe destacar
+que para la máquina remota se emplea el comando ssh para obtener la información y la configuración correspondiente 
+para el acceso sin contraseña ya se ha explicado en las prácticas anteriores.
 
-
-#Maquina 192.168.56.3:
-
--Descomentar las lineas del fichero rsyslog.conf:
-module(load="imudp")
-inmput(type="imdup" port="514")
-
--Añadir al fichero rsyslog.conf:
-local0.info /var/log/monitorizacion.log
-
+También se ha tenido que instalar en ambas máquinas el paquete: net-tools, para poder usar el comando netstat.
 
 --------
 PARTE 2:
 --------
 
-Para que los emails lleguen a root cambiar en el fichero logcheck.conf:
-SENDMAILTO="root"
+En primer lugar se ha instalado el paquete: logcheck , mediante apt install logcheck.
 
-Para que lea el fichero monitorizacion.log añadir a logcheck.logfiles:
-/var/log/monitorizacion.log
+Para que lea el fichero monitorizacion.log se ha añadido a  /etc/logcheck/logcheck.logfiles la siguiente línea:
+	/var/log/monitorizacion.log
 
 Para que muestre lo que queremos escribir en el fichero ignore.d.server/monitorizacion_rules:
 Conexiones: [012][0-9][0-9]
