@@ -11,9 +11,6 @@ con las siguientes ips: 192.168.56.4 (Host, central) y 192.168.56.2 (maquina apa
 En primer lugar se ha conigurado la maquina host, que es la que almacena los ficheros de log. Primero 
 se ha implementado el script practica6_parte1.sh. Después se ha configurado el fichero /etc/rsyslog.conf
 de la siguiente forma:
-	- Se ha descomentado el modulo e input del protocolo udp:
-			#module (load="imudp"
-			#input (type="imdup" port="514")
 	- Se ha añadido una regla:
 			#local0.info		/var/log/monitorizacion.log
 			(Con la especifiación que se pide en el enunciado, se concreta el fichero destino de los logs)
@@ -21,16 +18,10 @@ de la siguiente forma:
 Previamente el fichero /var/log/monitorizacion.log ha sido creado.
 Para finalizar se ha modificado el fichero /etc/crontab añadiendo un nuevo trabajo para que se ejecute 
 el script practica6_parte1.sh cada minuto, para ello se ha empleado la siguiente sintaxis:
-	* * * * user /home/user/prac6/practica6_parte1.sh > /dev/null
+	* * * * user /home/user/prac6/practica6_parte1.sh &> /dev/null
 
 Además se ha añadido la siguiente linea para que no envié emails:
 	MAILTO=/dev/null
-	
-	
-Para configurar la otra máquina (192.168.56.2) solo hay que añadir la siguiente línea al fichero /etc/rsyslog.conf:
-	local0.info @192.168.56.3:514
-	(El @ indica una conexion udp, la ip la maquina remota, y 514 el puerto estandar a usar).
-
 	
 			
 Finalmente como resultado tenemos que cada minutos se ejecuta el script, que recoge en el fichero 
@@ -50,13 +41,18 @@ Para que lea el fichero monitorizacion.log se ha añadido a  /etc/logcheck/logch
 	/var/log/monitorizacion.log
 
 Para que muestre lo que queremos escribir en el fichero ignore.d.server/monitorizacion_rules:
-Conexiones: [012][0-9][0-9]
-Procesos:	[0123][0-9][0-9]
+	[0-2],[0-9]G [0-9],[0-9]G
+	Conexiones: [01][0-9][0-9]
+	Procesos:	[012][0-9][0-9]
 
 Las expresiones regulares escritas en el fichero monitorizacion_rules hacen que
 mientras se cumpla lo que expresan lo ignorará y no enviará un correo.
-La primera expresion regular, si las conexiones del usuario superan las 300 enviará
+
+La primera expresión saltará cuando el espacio en uso supere los 3G.
+
+La segunda expresión regular, si las conexiones del usuario superan las 200 enviará
 un mail a root informando
-La segunda de la misma forma enviará un mail a root si supera el usuario los 400
+
+La tercera de la misma forma enviará un mail a root si supera el usuario los 300
 procesos.
 
