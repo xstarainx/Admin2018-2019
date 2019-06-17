@@ -19,7 +19,7 @@ uptime | cut -d "," -f2,3,4,5 | logger -p local0.info
 echo "free > " | logger -p local0.info
 free -h  |sed 's/ \{1,\}/ /g' |grep "Mem"| cut -d ' ' -f 3,4 | logger -p local0.info
 echo "swap > " | logger -p local0.info
-free -h  |sed 's/ \{1,\}/ /g' |grep "Swap"| cut -d ' ' -f 3
+free -h  |sed 's/ \{1,\}/ /g' |grep "Swap"| cut -d ' ' -f 3 | logger -p local0.info
 echo "df > " | logger -p local0.info
 df -h --total | grep "total" | sed 's/ \{1,\}/ /g' | cut -d ' ' -f 3,4 | logger -p local0.info
 netstat | awk 'BEGIN { x=0 } /CONNECTED/ {x=x+1} END { print "Conexiones: ", x } END {print "Puertos abiertos: " NR-4}' | logger -p local0.info
