@@ -17,7 +17,7 @@ fi
 echo "uptime0 > " | logger -p local0.info
 uptime | cut -d "," -f2,3,4,5 | logger -p local0.info
 echo "free > " | logger -p local0.info
-free -h | awk '{print $1 " " $2 " " $3 " " $4}' | logger -p local0.info
+free -h  |sed 's/ \{1,\}/ /g' |grep "Mem"| cut -d ' ' -f 3,4 | logger -p local0.info
 echo "df > " | logger -p local0.info
 df -h --total | grep "total" | sed 's/ \{1,\}/ /g' | cut -d ' ' -f 3,4 | logger -p local0.info
 netstat | awk 'BEGIN { x=0 } /CONNECTED/ {x=x+1} END { print "Conexiones: ", x } END {print "Puertos abiertos: " NR-4}' | logger -p local0.info
@@ -27,7 +27,7 @@ ps -e --user "$USER" | awk 'END {print "Procesos: " NR-1}' | logger -p local0.in
 echo "uptime0 maquina $ip > " | logger -p local0.info
 ssh -n -i "$ruta" as@$ip uptime | cut -d "," -f2,3,4,5 | logger -p local0.info
 echo "free maquina $ip > " | logger -p local0.info
-ssh -n -i "$ruta" as@$ip free -h | awk '{print $1 " " $2 " " $3 " " $4}' | logger -p local0.info
+ssh -n -i "$ruta" as@$ip free -h  |sed 's/ \{1,\}/ /g' |grep "Mem"| cut -d ' ' -f 3,4 | logger -p local0.info
 echo "df maquina $ip > " | logger -p local0.info
 ssh -n -i "$ruta" as@$ip df -h --total | grep "total" | sed 's/ \{1,\}/ /g' | cut -d ' ' -f 3,4 | logger -p local0.info
 ssh -n -i "$ruta" as@$ip netstat | awk 'BEGIN { x=0 } /CONNECTED/ {x=x+1} END { print "Conexiones de 192.168.56.2: ", x } END {print "Puertos abiertos de 192.168.56.2: " NR-4}' | logger -p local0.info
