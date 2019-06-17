@@ -17,7 +17,7 @@ fi
 echo "uptime0 > " | logger -p local0.info
 uptime | cut -d "," -f2,3,4,5 | logger -p local0.info
 echo "free > " | logger -p local0.info
-free -h | awk '{print $1 "\t" $2 " " $3 " " $4}' | logger -p local0.info
+free -h | awk '{print $1 " " $2 " " $3 " " $4}' | logger -p local0.info
 echo "df > " | logger -p local0.info
 df -h | awk '{print $1 " " $2 " " $3}' | logger -p local0.info
 netstat | awk 'BEGIN { x=0 } /CONNECTED/ {x=x+1} END { print "Conexiones: ", x } END {print "Puertos abiertos: " NR-4}' | logger -p local0.info
